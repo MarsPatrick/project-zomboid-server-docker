@@ -2,4 +2,3 @@ data/*
 !data/.gitkeep
 workshop-mods/*
 !workshop-mods/.gitkeep
-.env
