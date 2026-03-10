@@ -1,3 +1,4 @@
+# Forked to use podman and save my config
 # Project Zomboid dedicated server container
 
 This Dockerfile downloads the Project Zombie dedicated server using SteamCMD. Will allow you to deploy with ease a server in Kubernetes, Docker...
