@@ -56,7 +56,7 @@ RUN chmod 550 /server/scripts/search_folder.sh
 
 # Create required folders to keep their permissions on mount
 RUN mkdir -p "${HOMEDIR}/Zomboid"
-
+RUN mkdir -p "${HOMEDIR}/Zomboid/mods"
 WORKDIR ${HOMEDIR}
 
 # Expose ports
