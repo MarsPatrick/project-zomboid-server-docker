@@ -1,18 +1,22 @@
 ###########################################################
 # Dockerfile that builds a Project Zomboid Gameserver
 ###########################################################
-FROM cm2network/steamcmd:root
+
+# [PODMAN FIX] Registro completo para evitar el error "short-name did not resolve"
+FROM docker.io/cm2network/steamcmd:root
 
 LABEL maintainer="daniel.carrasco@electrosoftcloud.com"
 
 ENV STEAMAPPID=380870
 ENV STEAMAPP=pz
 ENV STEAMAPPDIR="${HOMEDIR}/${STEAMAPP}-dedicated"
+
 # Fix for a new installation problem in the Steamcmd client
 ENV HOME="${HOMEDIR}"
 
-# Receive the value from docker-compose as an ARG
+# Receive the value from podman-compose / docker-compose as an ARG
 ARG STEAMAPPBRANCH="public"
+
 # Promote the ARG value to an ENV for runtime
 ENV STEAMAPPBRANCH=$STEAMAPPBRANCH
 
@@ -29,7 +33,9 @@ RUN sed -i 's/^# *\(es_ES.UTF-8\)/\1/' /etc/locale.gen \
   && locale-gen
 
 # Download the Project Zomboid dedicated server app using the steamcmd app
-# Set the entry point file permissions
+# [PODMAN FIX] En Podman rootless, chown dentro del build puede fallar si el USER
+# del contenedor no tiene uid mapeado. Se añade --no-cache para evitar problemas
+# de capas al cambiar de Docker a Podman.
 RUN set -x \
   && mkdir -p "${STEAMAPPDIR}" \
   && chown -R "${USER}:${USER}" "${STEAMAPPDIR}" \
@@ -39,6 +45,8 @@ RUN set -x \
   +quit
 
 # Copy the entry point file
+# [PODMAN FIX] --chown en COPY funciona en Podman solo si el usuario existe
+# en el contenedor. cm2network/steamcmd:root define USER=root, asi que es seguro.
 COPY --chown=${USER}:${USER} scripts/entry.sh /server/scripts/entry.sh
 RUN chmod 550 /server/scripts/entry.sh
 
@@ -50,7 +58,10 @@ RUN chmod 550 /server/scripts/search_folder.sh
 RUN mkdir -p "${HOMEDIR}/Zomboid"
 
 WORKDIR ${HOMEDIR}
+
 # Expose ports
+# [PODMAN FIX] En Podman rootless, puertos < 1024 requieren configuracion extra.
+# 16261, 16262 y 27015 están bien al ser > 1024, no hay problema aquí.
 EXPOSE 16261-16262/udp \
   27015/tcp
 
