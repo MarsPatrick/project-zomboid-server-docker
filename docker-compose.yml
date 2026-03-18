@@ -1,18 +1,17 @@
-version: "3.7"
 services:
-  ProjectZomboidDedicatedServer:
-    image: danixu86/project-zomboid-dedicated-server:latest
+  projectzomboid:
+    image: docker.io/indifferentbroccoli/projectzomboid-server-docker:latest
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        - STEAMAPPBRANCH=${STEAMAPPBRANCH}
+    container_name: projectzomboid
+    stop_grace_period: 30s
+    ports:
+      - 8766:16261/udp
+      - 8767:16262/udp
+      - 8768:27015/tcp
+    environment:
+      GENERATE_SETTINGS: true
     env_file:
       - .env
-    ports:
-      - "16261-16262:16261-16262/udp"
-      - "8766-8768:8766-8768/udp"
     volumes:
-      - ./data:/home/steam/Zomboid
-      - ./workshop-mods:/home/steam/pz-dedicated/steamapps/workshop
+      - ./server-files:/project-zomboid
+      - ./server-data:/project-zomboid-config
