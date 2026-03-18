@@ -16,7 +16,7 @@ fi
 
 WORKSHOP_ID="$1"
 
-BASE="../server-files/steamapps/workshop/content/108600/$WORKSHOP_ID"
+BASE="./server-files/steamapps/workshop/content/108600/$WORKSHOP_ID"
 
 MODS_DIR="$BASE/mods"
 
